@@ -4,20 +4,27 @@ import {
   canvasWidth,
   platformHeight,
   platformWidth,
+  random,
 } from "./util";
 import { Player } from "./player";
 import { playerHeight, playerWidth } from "./util";
 import { Platform } from "./platform";
 export let playerX = canvasWidth / 2;
 export let playerY = canvasHeight / 4;
+
+let monstervelocity = 3;
+
+//   Represents the main game canvas.
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d")!;
 
 canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 
-canvas.style.background = "url('/images/bg1.png')";
-document.body.appendChild(canvas);
+window.addEventListener("load", () => {
+  canvas.style.background = "url('/images/bg.png')";
+  document.body.appendChild(canvas);
+});
 
 // Audio
 import jump from "/audio/jump.wav";
@@ -29,7 +36,7 @@ const gameOversound = new Audio(gameOverAudio) as HTMLAudioElement;
 
 //physics
 
-let initialVelocityY = -10; //starting velocity Y
+let initialVelocityY = -10;
 export let gravity = 0.4;
 
 let score = 0;
@@ -43,7 +50,6 @@ if (storedHighestScore) {
   highestScore = parseInt(storedHighestScore, 10);
 }
 
-// let animationId: number;
 const doodleLeft = new Image();
 doodleLeft.src = "./images/doodLeft.png";
 
@@ -67,10 +73,11 @@ document.addEventListener("keydown", press);
 document.addEventListener("keyup", release);
 
 function press(e: KeyboardEvent) {
-  if (e.key === "ArrowLeft") {
+  if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+    console.log("a", e.key);
     left = true;
   }
-  if (e.key === "ArrowRight") {
+  if (e.key === "ArrowRight" || e.key === "D" || e.key === "d") {
     right = true;
   }
   if (gameOver) {
@@ -81,10 +88,10 @@ function press(e: KeyboardEvent) {
 }
 
 function release(e: KeyboardEvent) {
-  if (e.key === "ArrowLeft") {
+  if (e.key === "ArrowLeft" || e.key === "A" || e.key === "a") {
     left = false;
   }
-  if (e.key === "ArrowRight") {
+  if (e.key === "ArrowRight" || e.key === "D" || e.key === "d") {
     right = false;
   }
 }
@@ -124,6 +131,10 @@ brokenImage.src = "/images/borken.png";
 let brokenImage2 = new Image();
 brokenImage2.src = "/images/broken2.png";
 
+/**
+ *  It represents the make platform using for loop and append in platform array
+ */
+
 function placePlatform() {
   platformArray = [];
 
@@ -149,21 +160,14 @@ function placePlatform() {
     );
     platformArray.push(platform);
   }
-  // let brokenPlatform = new Platform(
-  //   brokenImage,
-  //   100,
-  //   -500,
-  //   platformWidth,
-  //   platformHeight,
-  //   ctx
-  // );
-
-  // platformArray.push(brokenPlatform);
 }
 placePlatform();
 
 let points: number = 0;
 
+/**
+ * it represents show platform in the canvas
+ */
 function showPlatform() {
   for (let i = 0; i < platformArray.length; i++) {
     let singlePlatform = platformArray[i];
@@ -188,6 +192,10 @@ function showPlatform() {
   }
 }
 
+/**
+ * It represents make new platforms if previous platform is off the screen
+ */
+
 function newPlatform() {
   let randomX = Math.floor((Math.random() * canvasWidth * 3) / 4);
   let platform = new Platform(
@@ -201,7 +209,15 @@ function newPlatform() {
   platformArray.push(platform);
 }
 const ignoreValue: number = 15;
-function detectCollision(a: Player, b: Platform) {
+
+/**
+ *  It represents to check collision between player, platform and monster
+ * @param a Player
+ * @param b Platform | Monster
+ * @returns boolean
+ */
+
+function detectCollision(a: Player, b: Platform | Monster) {
   return (
     a.x + ignoreValue < b.x + b.width &&
     a.x + a.width > b.x &&
@@ -209,10 +225,94 @@ function detectCollision(a: Player, b: Platform) {
     a.y + a.height > b.y
   );
 }
+/**
+ * It represents to update score
+ */
 
+function updateScore() {
+  if (doodle.vy < 0) {
+    maxScore += points;
+    if (score < maxScore) {
+      score = maxScore;
+    }
+  } else if (doodle.vy >= 0) {
+    maxScore -= points;
+  }
+
+  if (score > highestScore) {
+    highestScore = score;
+    localStorage.setItem("highestDoodle", highestScore.toString());
+  }
+}
+
+let MonsterArray: Monster[] = [];
+
+let monster = new Image();
+monster.src = "/images/enemySheet.png";
+
+/**
+ * It represents the make monster and append in array
+ */
+function monsterPlace() {
+  MonsterArray = [];
+  let monsterAppear = new Monster(
+    monster,
+    0,
+    719,
+    166,
+    116,
+    random({ min: 0, max: canvasWidth - 80 }),
+    -100,
+    80,
+    80,
+    ctx
+  );
+  MonsterArray.push(monsterAppear);
+}
+
+/**
+ * It represents the call monster according to probability
+ */
+function callmonsterFunction() {
+  let probability = 0.001;
+  let incrementRate = 0.001;
+  let currentProbability = probability + incrementRate * score;
+  currentProbability = Math.min(currentProbability, 1.0);
+
+  let num = Math.random();
+  if (num < probability) {
+    monsterPlace();
+  } else {
+  }
+}
+
+/**
+ * It represents the  show monster in screen and moving
+ */
+function monsterFunction() {
+  for (let i = 0; i < MonsterArray.length; i++) {
+    let newMonster = MonsterArray[i];
+    newMonster.x += monstervelocity;
+    if (newMonster.x + newMonster.width > canvasWidth) {
+      monstervelocity *= -1;
+    } else if (newMonster.x < 0) {
+      newMonster.x *= -1;
+    }
+    newMonster.y += 4;
+    if (detectCollision(doodle, newMonster)) {
+      gameOver = true;
+    }
+    newMonster.drawMonster();
+  }
+}
+
+/**
+ * It is the main update function using request animation frame
+ * It has calling function which needed to be call every frame
+ * @returns if game over return
+ */
 function updateGame() {
   requestAnimationFrame(updateGame);
-
   if (gameOver) {
     return;
   }
@@ -224,6 +324,8 @@ function updateGame() {
   showPlatform();
   doodle.updatePlayer();
   updateScore();
+  monsterFunction();
+  callmonsterFunction();
   ctx.fillStyle = "black";
   ctx.font = "16px sans-serif";
   ctx.fillText(`${score}`, 5, 20);
@@ -243,8 +345,9 @@ function updateGame() {
   }
 }
 
-// updateGame();
-
+/**
+ * It represents the first image  before start  game
+ */
 function firstShow() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   canvas.style.background = "url('/images/bg.png')";
@@ -252,6 +355,8 @@ function firstShow() {
   ctx.font = "50px 'Indie Flower', cursive";
 
   ctx.fillText("Press Enter to Start", 90, 400);
+  ctx.font = "40px 'Indie Flower', cursive";
+  ctx.fillText("Navigate  a || d or arrowkey", 60, 210);
   document.addEventListener("keypress", (event) => {
     if (event.key === "Enter") {
       updateGame();
@@ -260,53 +365,3 @@ function firstShow() {
 }
 
 firstShow();
-
-function updateScore() {
-  if (doodle.vy < 0) {
-    maxScore += points;
-    if (score < maxScore) {
-      score = maxScore;
-    }
-  } else if (doodle.vy >= 0) {
-    maxScore -= points;
-  }
-
-  if (score > highestScore) {
-    highestScore = score;
-    localStorage.setItem("highestDoodle", highestScore.toString());
-  }
-}
-
-// for add monster not done yet
-let MonsterArray: Monster[] = [];
-
-let monster = new Image();
-monster.src = "/images/enemySheet.png";
-
-function monsterPlace() {
-  MonsterArray = [];
-  for (let i = 0; i < 10; i++) {
-    let monsterAppear = new Monster(
-      monster,
-      0,
-      719,
-      166,
-      116,
-      canvasWidth / 2,
-      100,
-      100,
-      100,
-      ctx
-    );
-    MonsterArray.push(monsterAppear);
-  }
-}
-
-monsterPlace();
-
-// function monsterFunction() {
-//   for (let i = 0; i < MonsterArray.length; i++) {
-//     let newMonster = MonsterArray[i];
-//     newMonster.drawMonster();
-//   }
-// }

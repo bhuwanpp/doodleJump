@@ -1,5 +1,8 @@
 import { gravity } from "./main";
-
+/**
+ * It represents doodle Player in the game
+ * It contains img, x, y, width , height, its velocity
+ */
 export class Player {
   constructor(
     public img: HTMLImageElement,

@@ -1,3 +1,7 @@
+/**
+ * It represents all platform in the game
+ * It contains img, x, y, width , height
+ */
 export class Platform {
   constructor(
     public img: HTMLImageElement,

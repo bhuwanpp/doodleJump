@@ -1,3 +1,7 @@
+/**
+ * It represents the Monster enemy it contain x, y, width , height
+ */
+
 export class Monster {
   constructor(
     public img: HTMLImageElement,
