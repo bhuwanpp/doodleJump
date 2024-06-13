@@ -43,7 +43,7 @@ if (storedHighestScore) {
   highestScore = parseInt(storedHighestScore, 10);
 }
 
-let animationId: number;
+// let animationId: number;
 const doodleLeft = new Image();
 doodleLeft.src = "./images/doodLeft.png";
 
@@ -211,7 +211,7 @@ function detectCollision(a: Player, b: Platform) {
 }
 
 function updateGame() {
-  animationId = requestAnimationFrame(updateGame);
+  requestAnimationFrame(updateGame);
 
   if (gameOver) {
     return;
@@ -304,9 +304,9 @@ function monsterPlace() {
 
 monsterPlace();
 
-function monsterFunction() {
-  for (let i = 0; i < MonsterArray.length; i++) {
-    let newMonster = MonsterArray[i];
-    newMonster.drawMonster();
-  }
-}
+// function monsterFunction() {
+//   for (let i = 0; i < MonsterArray.length; i++) {
+//     let newMonster = MonsterArray[i];
+//     newMonster.drawMonster();
+//   }
+// }
