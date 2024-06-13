@@ -4,7 +4,6 @@ import {
   canvasWidth,
   platformHeight,
   platformWidth,
-  random,
 } from "./util";
 import { Player } from "./player";
 import { playerHeight, playerWidth } from "./util";

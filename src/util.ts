@@ -1,8 +1,6 @@
 export const canvasWidth = 640;
 export const canvasHeight = 700;
 
-// export const gravity = 3;
-
 export let playerX = canvasWidth / 2;
 export let playerY = 150;
 export const playerWidth = 100;

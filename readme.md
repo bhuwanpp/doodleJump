@@ -1,5 +1,7 @@
 ## DoodleJump TS Assignment LF
 
+[Demo Link](https://doodlejumplf.netlify.app/)
+
 #### Features
 
 <ul>
