@@ -74,13 +74,13 @@ document.addEventListener("keyup", release);
 
 function press(e: KeyboardEvent) {
   if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
-    console.log("a", e.key);
     left = true;
   }
   if (e.key === "ArrowRight" || e.key === "D" || e.key === "d") {
     right = true;
   }
   if (gameOver) {
+    // click space
     if (e.key === " ") {
       location.reload();
     }
@@ -336,7 +336,7 @@ function updateGame() {
     ctx.font = "22px sans-serif";
 
     ctx.fillText(`Your Score  ${score}`, canvasWidth / 4, 500);
-    ctx.fillText(`HighestScore:  ${highestScore}`, canvasWidth / 4, 600);
+    ctx.fillText(`Highest Score:  ${highestScore}`, canvasWidth / 4, 600);
     ctx.fillText(
       "Game Over: Press 'Space' to Restart",
       canvasWidth / 4,
